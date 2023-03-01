@@ -233,9 +233,7 @@ const line = d3.line()
       .y(d => yScale(d.deaths));
 */
 
-// inizio primo grafico
-//inizio primo grafico
-//commento prova
+//commento prova2
 const countryCases1 = d3.rollups(
   data,
   v => d3.sum(v, d => d.cases),
