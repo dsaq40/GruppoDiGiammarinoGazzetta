@@ -8,7 +8,7 @@ const height_mean = svgEl_mean.getAttribute('height')
 const padding = 32
 const svg_bar = d3.select('#bar')
 
-var allGroup = ["United States of America", "India", "Brazil", "Russia"  , "France"]
+var allGroup = ["United States of America", "United Kingdom", "Brazil", "Russia"  , "France"]
 // A color scale: one color for each group
 var myColor = d3.scaleOrdinal()
 .domain(allGroup)
@@ -232,23 +232,26 @@ const line = d3.line()
       .x(d => xScale(d.date))
       .y(d => yScale(d.deaths));
 */
-
-//commento prova2
+const selectedCountries = ["Bolivia", "Egypt", "Yemen" ,"Sudan","Syria"];
 const countryCases1 = d3.rollups(
-  data,
+  data.filter(d => selectedCountries.includes(d.country)),
   v => d3.sum(v, d => d.cases),
   d => d.country
 )
   .map(([k, v]) => ({ country: k, cases: v }))
-  .sort((a, b) => d3.descending(a.cases, b.cases))
-  .slice(0, 5)
+  .sort((a, b) => d3.descending(a.cases, b.cases));
+
+console.log(countryCases1);
 
 const countryDeaths1 = d3.rollups(
-  data,
+  data.filter(d => selectedCountries.includes(d.country)),
   v => d3.sum(v, d => d.deaths),
   d => d.country
 )
   .map(([k, v]) => ({ country: k, deaths: v }))
+  .sort((a, b) => d3.descending(a.deaths, b.deaths));
+
+
 const countryCasesAndDeaths = d3.rollup(
   data,
   v => ({
@@ -268,7 +271,7 @@ const countryCasesList1 = countryCases1.map(countryCase => {
   return { country, cases, casesPerMillion, deathsPercentage };
 });
 
-
+console.log(countryCasesList1)
 // Set up the scales for the x and y axes
 const xScale = d3.scaleBand()
   .range([margin.left, width_bar-100 - margin.right])
@@ -301,13 +304,13 @@ svg_bar.append('g')
 
 
 
-svg_bar.selectAll('.death-bars-upper')
+  svg_bar.selectAll('.death-bars-upper')
   .data(countryCasesList1)
   .enter()
   .append('rect')
   .attr('class', 'death-bars-upper')
   .attr('x', d => xScale(d.country)+27)
-  .attr('y', d => yScale(100))
+  .attr('y', d => yScale(d.deathsPercentage))
   .attr('width', xScale.bandwidth()/4)
   .attr('height', d => (d.deathsPercentage / 100) * (yScale(0) - yScale(100)))
   .attr('fill', 'darkgreen')
@@ -319,32 +322,17 @@ svg_bar.selectAll('.death-bars-lower')
   .append('rect')
   .attr('class', 'death-bars-lower')
   .attr('x', d => xScale(d.country)+27)
-  .attr('y', d => yScale(100-d.deathsPercentage))
+  .attr('y', d => yScale(100))
   .attr('width', xScale.bandwidth()/4)
   .attr('height', d => -(yScale(100) - yScale(d.deathsPercentage)))
   .attr('fill', 'lightgreen')
   .attr('opacity', 0.7);
 
-
-
-
-/*	svg_bar.selectAll('text.values') // if there is any rect, update it with the new data
-	.data(countryCasesList1)
-	.enter() // create new elements as needed
-	.append('text') // create the actual rects
-	.attr('x', (d) => xScale(d.country) + xScale.bandwidth() / 4)
-  .attr('y', (d) => yScale (100))
-		.text(d => d.cases)
-		.attr('text-anchor', 'middle') // centring the text
-		.attr('class', 'cases')
-		.attr('fill', textColor)
-
-*/
     svg_bar.selectAll('text.values') // if there is any rect, update it with the new data
     .data(countryCasesList1)
     .enter() // create new elements as needed
     .append('text') // create the actual rects
-    .attr('x', (d) => xScale(d.country)+27 + xScale.bandwidth() / 4)
+    .attr('x', (d) => xScale(d.country)+17 + xScale.bandwidth() / 4)
     .attr('y', (d) => yScale(100) - 10) // sposta il testo leggermente sopra la barra
     .text(function(d) {
       let val = d.cases;
@@ -357,7 +345,7 @@ svg_bar.selectAll('.death-bars-lower')
         unit = 'Mln';
       } else if (val >= 1e3) {
         val = (val / 1e3).toFixed(0);
-        unit = 'Mgl';
+        unit = 'K';
       } else {
         val = val.toFixed(0);
       }
@@ -409,6 +397,3 @@ legend.append('text')
   .attr('x', 30)
   .attr('y', 55)
   .text('Cases');
-
-
-
