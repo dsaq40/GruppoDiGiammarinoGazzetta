@@ -171,10 +171,10 @@ d3.select("#selectButton")
       if(!dataFilter) {
         var dataFilter;
         dataFilter = country_grouped.get(d3.select("#selectButton").property("value"));
-        console.log(dataFilter)
+        
     }else{
       dataFilter = country_grouped.get(selectedOption)
-      console.log(dataFilter)
+      
     }
       // Give these new data to update line
       y.domain([0 , d3.max(dataFilter, d => d.deaths)]);
